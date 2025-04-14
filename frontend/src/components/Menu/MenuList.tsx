@@ -20,8 +20,8 @@ export const MenuList: React.FC<MenuListProps> = ({ onEdit }) => {
     try {
       setLoading(true);
       const items = selectedCategory === 'ALL'
-        ? await menuService.getAllItems()
-        : await menuService.getItemsByCategory(selectedCategory);
+        ? await menuService.getAll()
+        : await menuService.getByCategory(selectedCategory);
       setMenuItems(items);
     } catch (error) {
       console.error('Error loading menu items:', error);
@@ -33,7 +33,7 @@ export const MenuList: React.FC<MenuListProps> = ({ onEdit }) => {
   const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
-        await menuService.deleteItem(id);
+        await menuService.delete(parseInt(id));
         setMenuItems(items => items.filter(item => item.id !== id));
       } catch (error) {
         console.error('Error deleting item:', error);

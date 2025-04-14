@@ -1,4 +1,5 @@
 using CafeShopV2.Core.Entities;
+using CafeShopV2.Core.Enums;
 using CafeShopV2.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,7 +44,12 @@ public sealed class MenuController : ControllerBase
     {
         try
         {
-            var menus = await _menuService.GetMenusByCategoryAsync(category);
+            if (!Enum.TryParse<MenuCategory>(category, true, out var menuCategory))
+            {
+                return BadRequest($"Invalid category: {category}. Valid categories are: {string.Join(", ", Enum.GetNames(typeof(MenuCategory)))}");
+            }
+            
+            var menus = await _menuService.GetMenusByCategoryAsync(menuCategory);
             return Ok(menus);
         }
         catch (ArgumentException ex)
@@ -99,11 +105,14 @@ public sealed class MenuController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _menuService.DeleteMenuAsync(id);
-        if (!result)
+        try
+        {
+            await _menuService.DeleteMenuAsync(id);
+            return NoContent();
+        }
+        catch (InvalidOperationException)
         {
             return NotFound();
         }
-        return NoContent();
     }
 } 

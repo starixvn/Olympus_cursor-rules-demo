@@ -1,18 +1,18 @@
 export interface MenuItem {
-  id: string;
+  id: number;
   name: string;
   description: string;
   price: number;
   category: MenuCategory;
-  image?: string;
+  imageUrl: string;
   isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export enum MenuCategory {
   Food = 'Food',
-  Drinks = 'Drinks',
-  Desserts = 'Desserts',
-  Snacks = 'Snacks'
+  Drinks = 'Drinks'
 }
 
 export interface MenuItemFormData {
@@ -20,6 +20,6 @@ export interface MenuItemFormData {
   description: string;
   price: number;
   category: MenuCategory;
-  image?: string;
+  imageUrl?: string;
   isAvailable: boolean;
 } 

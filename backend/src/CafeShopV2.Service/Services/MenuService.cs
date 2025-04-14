@@ -1,4 +1,5 @@
 using CafeShopV2.Core.Entities;
+using CafeShopV2.Core.Enums;
 using CafeShopV2.Core.Interfaces;
 
 namespace CafeShopV2.Service.Services;
@@ -22,10 +23,8 @@ public sealed class MenuService : IMenuService
         return await _menuRepository.GetByIdAsync(id);
     }
 
-    public async Task<IEnumerable<Menu>> GetMenusByCategoryAsync(string category)
+    public async Task<IEnumerable<Menu>> GetMenusByCategoryAsync(MenuCategory category)
     {
-        ArgumentException.ThrowIfNullOrEmpty(category);
-        
         return await _menuRepository.GetByCategoryAsync(category);
     }
 
@@ -45,15 +44,18 @@ public sealed class MenuService : IMenuService
         return await _menuRepository.UpdateAsync(menu);
     }
 
-    public async Task<bool> DeleteMenuAsync(int id)
+    public async Task DeleteMenuAsync(int id)
     {
-        return await _menuRepository.DeleteAsync(id);
+        var result = await _menuRepository.DeleteAsync(id);
+        if (!result)
+        {
+            throw new InvalidOperationException($"Menu with ID {id} not found");
+        }
     }
 
     private static void ValidateMenu(Menu menu)
     {
         ArgumentException.ThrowIfNullOrEmpty(menu.Name);
-        ArgumentException.ThrowIfNullOrEmpty(menu.Category);
         
         if (menu.Price < 0)
         {

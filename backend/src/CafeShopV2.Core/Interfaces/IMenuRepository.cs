@@ -1,4 +1,5 @@
 using CafeShopV2.Core.Entities;
+using CafeShopV2.Core.Enums;
 
 namespace CafeShopV2.Core.Interfaces;
 
@@ -8,7 +9,7 @@ public interface IMenuRepository
     
     Task<Menu?> GetByIdAsync(int id);
     
-    Task<IEnumerable<Menu>> GetByCategoryAsync(string category);
+    Task<IEnumerable<Menu>> GetByCategoryAsync(MenuCategory category);
     
     Task<Menu> CreateAsync(Menu menu);
     

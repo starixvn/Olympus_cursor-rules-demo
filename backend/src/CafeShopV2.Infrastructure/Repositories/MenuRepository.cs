@@ -1,4 +1,5 @@
 using CafeShopV2.Core.Entities;
+using CafeShopV2.Core.Enums;
 using CafeShopV2.Core.Interfaces;
 using CafeShopV2.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -24,12 +25,10 @@ public sealed class MenuRepository : IMenuRepository
         return await _context.Menus.FindAsync(id);
     }
 
-    public async Task<IEnumerable<Menu>> GetByCategoryAsync(string category)
+    public async Task<IEnumerable<Menu>> GetByCategoryAsync(MenuCategory category)
     {
-        ArgumentException.ThrowIfNullOrEmpty(category);
-        
         return await _context.Menus
-            .Where(m => m.Category.ToLower() == category.ToLower())
+            .Where(m => m.Category == category)
             .ToListAsync();
     }
 

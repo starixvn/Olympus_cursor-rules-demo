@@ -1,76 +1,56 @@
-import { MenuItem, MenuCategory, MenuItemFormData } from '../types/menu';
+import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+export enum MenuCategory {
+  Food = 'Food',
+  Drinks = 'Drinks'
+}
+
+export interface Menu {
+  id: number;
+  name: string;
+  description: string;
+  category: MenuCategory;
+  price: number;
+  imageUrl: string;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const api = axios.create({
+  baseURL: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 export const menuService = {
-  getAllItems: async (): Promise<MenuItem[]> => {
-    const response = await fetch(`${API_BASE_URL}/MenuItems`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch menu items');
-    }
-    return response.json();
+  getAll: async (): Promise<Menu[]> => {
+    const response = await api.get<Menu[]>('/menu');
+    return response.data;
   },
 
-  getItemById: async (id: string): Promise<MenuItem | undefined> => {
-    const response = await fetch(`${API_BASE_URL}/MenuItems/${id}`);
-    if (!response.ok) {
-      if (response.status === 404) {
-        return undefined;
-      }
-      throw new Error('Failed to fetch menu item');
-    }
-    return response.json();
+  getById: async (id: number): Promise<Menu> => {
+    const response = await api.get<Menu>(`/menu/${id}`);
+    return response.data;
   },
 
-  getItemsByCategory: async (category: MenuCategory): Promise<MenuItem[]> => {
-    const response = await fetch(`${API_BASE_URL}/MenuItems/category/${category}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch menu items by category');
-    }
-    return response.json();
+  getByCategory: async (category: MenuCategory): Promise<Menu[]> => {
+    const response = await api.get<Menu[]>(`/menu/category/${category}`);
+    return response.data;
   },
 
-  addItem: async (item: MenuItemFormData): Promise<MenuItem> => {
-    const response = await fetch(`${API_BASE_URL}/MenuItems`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(item),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to add menu item');
-    }
-    return response.json();
+  create: async (menu: Omit<Menu, 'id' | 'createdAt' | 'updatedAt'>): Promise<Menu> => {
+    const response = await api.post<Menu>('/menu', menu);
+    return response.data;
   },
 
-  updateItem: async (id: string, item: Partial<MenuItemFormData>): Promise<MenuItem | undefined> => {
-    const response = await fetch(`${API_BASE_URL}/MenuItems/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(item),
-    });
-    if (!response.ok) {
-      if (response.status === 404) {
-        return undefined;
-      }
-      throw new Error('Failed to update menu item');
-    }
-    return response.json();
+  update: async (id: number, menu: Partial<Menu>): Promise<Menu> => {
+    const response = await api.put<Menu>(`/menu/${id}`, menu);
+    return response.data;
   },
 
-  deleteItem: async (id: string): Promise<boolean> => {
-    const response = await fetch(`${API_BASE_URL}/MenuItems/${id}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) {
-      if (response.status === 404) {
-        return false;
-      }
-      throw new Error('Failed to delete menu item');
-    }
-    return true;
-  }
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/menu/${id}`);
+  },
 }; 
