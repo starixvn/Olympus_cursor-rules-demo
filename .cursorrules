@@ -1,4 +1,8 @@
-# CODING STANDARD FOR CSHARP: ALWAYS FOLLOW SONARQUBE RULES.
+# CURSOR AI AGENT:
+Always generate command for powershell
+
+
+# CODING STANDARD FOR CSHARP:
 
 Rule csharpsquid:S1698
 

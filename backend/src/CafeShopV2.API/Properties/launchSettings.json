@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "CafeShopV2.API": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50973;http://localhost:50974"
+    }
+  }
+}
