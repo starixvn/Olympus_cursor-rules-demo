@@ -14,9 +14,9 @@ export const MenuManagement: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleEdit = async (id: string) => {
+  const handleEdit = async (id: number) => {
     try {
-      const item = await menuService.getItemById(id);
+      const item = await menuService.getById(id);
       if (item) {
         setSelectedItem(item);
         setShowForm(true);

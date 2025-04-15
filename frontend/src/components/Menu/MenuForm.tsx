@@ -14,7 +14,8 @@ export const MenuForm: React.FC<MenuFormProps> = ({ item, onSave, onCancel }) =>
     name: item?.name || '',
     description: item?.description || '',
     price: item?.price || 0,
-    category: item?.category || MenuCategory.FOOD,
+    category: item?.category || MenuCategory.Food,
+    imageUrl: item?.imageUrl || '',
     isAvailable: item?.isAvailable ?? true,
   });
 
@@ -22,9 +23,9 @@ export const MenuForm: React.FC<MenuFormProps> = ({ item, onSave, onCancel }) =>
     e.preventDefault();
     try {
       if (item) {
-        await menuService.updateItem(item.id, formData);
+        await menuService.update(item.id, formData);
       } else {
-        await menuService.addItem(formData);
+        await menuService.create(formData);
       }
       onSave();
     } catch (error) {
@@ -102,6 +103,18 @@ export const MenuForm: React.FC<MenuFormProps> = ({ item, onSave, onCancel }) =>
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="imageUrl">Image URL:</label>
+        <input
+          type="text"
+          id="imageUrl"
+          name="imageUrl"
+          value={formData.imageUrl}
+          onChange={handleChange}
+          required
+        />
       </div>
 
       <div className="form-group">

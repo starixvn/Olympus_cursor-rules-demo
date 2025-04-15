@@ -1,96 +1,101 @@
 import React, { useEffect, useState } from 'react';
 import { MenuItem, MenuCategory } from '../../types/menu';
 import { menuService } from '../../services/menuService';
-import { Button } from '../Button/Button';
+import { Button, Card, CardContent, CardMedia, Grid, Typography, Box } from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
 interface MenuListProps {
-  onEdit?: (id: string) => void;
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
+  category?: MenuCategory;
 }
 
-export const MenuList: React.FC<MenuListProps> = ({ onEdit }) => {
+export const MenuList: React.FC<MenuListProps> = ({ onEdit, onDelete, category }) => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<MenuCategory | 'ALL'>('ALL');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadMenuItems();
-  }, [selectedCategory]);
-
-  const loadMenuItems = async () => {
-    try {
-      setLoading(true);
-      const items = selectedCategory === 'ALL'
-        ? await menuService.getAll()
-        : await menuService.getByCategory(selectedCategory);
-      setMenuItems(items);
-    } catch (error) {
-      console.error('Error loading menu items:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
+    const fetchMenuItems = async () => {
       try {
-        await menuService.delete(parseInt(id));
-        setMenuItems(items => items.filter(item => item.id !== id));
-      } catch (error) {
-        console.error('Error deleting item:', error);
+        setLoading(true);
+        const items = category 
+          ? await menuService.getByCategory(category)
+          : await menuService.getAll();
+        setMenuItems(items);
+      } catch (err) {
+        setError('Failed to load menu items');
+        console.error('Error fetching menu items:', err);
+      } finally {
+        setLoading(false);
       }
+    };
+
+    fetchMenuItems();
+  }, [category]);
+
+  const handleDelete = async (id: number) => {
+    try {
+      await menuService.delete(id);
+      setMenuItems(menuItems.filter(item => item.id !== id));
+      onDelete?.(id);
+    } catch (err) {
+      setError('Failed to delete menu item');
+      console.error('Error deleting menu item:', err);
     }
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
   }
 
   return (
-    <div className="menu-list">
-      <div className="category-filters">
-        <Button
-          variant={selectedCategory === 'ALL' ? 'primary' : 'secondary'}
-          onClick={() => setSelectedCategory('ALL')}
-        >
-          All
-        </Button>
-        {Object.values(MenuCategory).map(category => (
-          <Button
-            key={category}
-            variant={selectedCategory === category ? 'primary' : 'secondary'}
-            onClick={() => setSelectedCategory(category)}
-          >
-            {category}
-          </Button>
-        ))}
-      </div>
-
-      <div className="menu-items">
-        {menuItems.map(item => (
-          <div key={item.id} className="menu-item">
-            <h3>{item.name}</h3>
-            <p>{item.description}</p>
-            <p className="price">${item.price.toFixed(2)}</p>
-            <p className="category">Category: {item.category}</p>
-            <p className="availability">
-              Status: {item.isAvailable ? 'Available' : 'Not Available'}
-            </p>
-            <div className="actions">
-              {onEdit && (
-                <Button 
-                  onClick={() => onEdit(item.id)}
+    <Grid container spacing={3}>
+      {menuItems.map((item) => (
+        <Grid item xs={12} sm={6} md={4} key={item.id}>
+          <Card>
+            <CardMedia
+              component="img"
+              height="140"
+              image={item.imageUrl}
+              alt={item.name}
+            />
+            <CardContent>
+              <Typography variant="h6" component="div">
+                {item.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {item.description}
+              </Typography>
+              <Typography variant="h6" color="primary">
+                ${item.price.toFixed(2)}
+              </Typography>
+              <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                <Button
+                  size="small"
+                  startIcon={<EditIcon />}
+                  onClick={() => onEdit?.(item.id)}
                   data-testid={`edit-button-${item.id}`}
                 >
                   Edit
                 </Button>
-              )}
-              <Button onClick={() => handleDelete(item.id)}>
-                Delete
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+                <Button
+                  size="small"
+                  color="error"
+                  startIcon={<DeleteIcon />}
+                  onClick={() => handleDelete(item.id)}
+                >
+                  Delete
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
   );
 }; 

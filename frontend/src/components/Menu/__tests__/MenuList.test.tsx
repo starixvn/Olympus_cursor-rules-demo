@@ -9,28 +9,35 @@ import { MenuItem } from '../../../types/menu';
 // Mock the menuService
 vi.mock('../../../services/menuService', () => ({
   menuService: {
-    getAllItems: vi.fn(),
-    getItemsByCategory: vi.fn(),
-    deleteItem: vi.fn()
+    getAll: vi.fn(),
+    getById: vi.fn(),
+    getByCategory: vi.fn(),
+    delete: vi.fn()
   }
 }));
 
 const mockMenuItems: MenuItem[] = [
   {
-    id: '1',
+    id: 1,
     name: 'Test Item 1',
     description: 'Test Description 1',
     price: 9.99,
-    category: MenuCategory.FOOD,
-    isAvailable: true
+    category: MenuCategory.Food,
+    imageUrl: 'test-image-1.jpg',
+    isAvailable: true,
+    createdAt: '2024-03-20T00:00:00Z',
+    updatedAt: '2024-03-20T00:00:00Z'
   },
   {
-    id: '2',
+    id: 2,
     name: 'Test Item 2',
     description: 'Test Description 2',
     price: 12.99,
-    category: MenuCategory.DRINK,
-    isAvailable: true
+    category: MenuCategory.Drinks,
+    imageUrl: 'test-image-2.jpg',
+    isAvailable: true,
+    createdAt: '2024-03-20T00:00:00Z',
+    updatedAt: '2024-03-20T00:00:00Z'
   }
 ];
 
@@ -39,7 +46,7 @@ describe('MenuList', () => {
     // Reset mocks before each test
     vi.clearAllMocks();
     // Setup default mock implementation
-    (menuService.getAllItems as ReturnType<typeof vi.fn>).mockResolvedValue(mockMenuItems);
+    (menuService.getAll as ReturnType<typeof vi.fn>).mockResolvedValue(mockMenuItems);
   });
 
   it('renders menu items correctly', async () => {
@@ -71,6 +78,6 @@ describe('MenuList', () => {
     fireEvent.click(editButton);
     
     // Verify that onEdit was called with the correct ID
-    expect(mockOnEdit).toHaveBeenCalledWith('1');
+    expect(mockOnEdit).toHaveBeenCalledWith(1);
   });
 }); 
